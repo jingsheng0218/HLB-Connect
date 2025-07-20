@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <title>HLB Connect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hotspot {
+      position: absolute;
+      background: rgba(255, 0, 0, 0); /* Invisible clickable area */
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(100%); opacity: 0.3; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOutLeft {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(-100%); opacity: 0; }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(-100%); opacity: 0.3; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOutRight {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    .screen.animating {
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.5s forwards;
+    }
+
+    .slide-out-left {
+      animation: slideOutLeft 0.5s forwards;
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.5s forwards;
+    }
+
+    .slide-out-right {
+      animation: slideOutRight 0.5s forwards;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="screen active" id="screen-home">
+    <img src="Home.jpg" alt="Home" />
+    <!-- 点 Overview -->
+    <div class="hotspot" style="left: 20%; top: 90%; width: 20%; height: 8%;" onclick="goTo('screen-overview')"></div>
+  </div>
+
+  <div class="screen" id="screen-overview">
+    <img src="Overview.jpg" alt="Overview" />
+    <!-- 点 Fixed Deposit -->
+    <div class="hotspot" style="left: 10%; top: 43%; width: 80%; height: 10%;" onclick="goTo('screen-fixed')"></div>
+  </div>
+
+  <div class="screen" id="screen-fixed">
+    <img src="Fixed Deposit.jpg" alt="Fixed Deposit" />
+    <!-- 点某笔FD -->
+    <div class="hotspot" style="left: 10%; top: 76%; width: 80%; height: 12%;" onclick="goTo('screen-receipt')"></div>
+  </div>
+
+  <div class="screen" id="screen-receipt">
+    <img src="Receipt.jpg" alt="Receipt" />
+  </div>
+
+  <script>
+    let currentScreen = document.querySelector('.screen.active');
+
+    function goTo(targetId) {
+      const target = document.getElementById(targetId);
+      if (!target || target === currentScreen) return;
+
+      const isForward = (
+        (currentScreen.id === 'screen-home' && targetId === 'screen-overview') ||
+        (currentScreen.id === 'screen-overview' && targetId === 'screen-fixed') ||
+        (currentScreen.id === 'screen-fixed' && targetId === 'screen-receipt')
+      );
+
+      const outClass = isForward ? 'slide-out-left' : 'slide-out-right';
+      const inClass = isForward ? 'slide-in-right' : 'slide-in-left';
+
+      currentScreen.classList.add('animating', outClass);
+      target.classList.add('screen', 'animating', inClass);
+      target.style.zIndex = 20;
+
+      setTimeout(() => {
+        currentScreen.classList.remove('active', 'animating', outClass);
+        target.classList.remove('animating', inClass);
+        target.classList.add('active');
+        currentScreen = target;
+      }, 500);
+    }
+
+    // 注册 Service Worker（可选）
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+
+</html>
