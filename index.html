@@ -105,7 +105,7 @@
 
 <body>
   <div class="screen active" id="screen-home">
-    <img src="Home.jpg" alt="Home" />
+    <img src="Home.png" alt="Home" />
     <div class="hotspot" style="left: 18%; top: 88%; width: 24%; height: 10%;" onclick="goTo('screen-overview')"></div>
   </div>
 
@@ -116,7 +116,7 @@
 
   <div class="screen" id="screen-fixed">
     <img src="Fixed Deposit.jpg" alt="Fixed Deposit" />
-    <div class="hotspot" style="left: 8%; top: 37%; width: 84%; height: 14%;" onclick="goTo('screen-receipt')"></div>
+    <div class="hotspot" style="left: 8%; top: 18%; width: 84%; height: 14%;" onclick="goTo('screen-receipt')"></div>
   </div>
 
   <div class="screen" id="screen-receipt" style="background-color: #FAF7F0;">
@@ -151,7 +151,6 @@
       }, 500);
     }
 
-    // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(reg => console.log('SW registered'))
