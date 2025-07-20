@@ -5,11 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#ffffff" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
   <title>HLB Connect</title>
   <style>
     * {
@@ -22,7 +24,7 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #000;
+      background: #fff;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -44,14 +46,18 @@
     }
 
     .screen img {
-      width: 100%;
+      width: auto;
       height: 100%;
       object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .hotspot {
       position: absolute;
-      background: rgba(255, 0, 0, 0); /* Invisible clickable area */
+      background: rgba(255, 0, 0, 0);
     }
 
     @keyframes slideInLeft {
@@ -100,20 +106,17 @@
 <body>
   <div class="screen active" id="screen-home">
     <img src="Home.jpg" alt="Home" />
-    <!-- 点 Overview -->
-    <div class="hotspot" style="left: 20%; top: 90%; width: 20%; height: 8%;" onclick="goTo('screen-overview')"></div>
+    <div class="hotspot" style="left: 18%; top: 88%; width: 24%; height: 10%;" onclick="goTo('screen-overview')"></div>
   </div>
 
   <div class="screen" id="screen-overview">
     <img src="Overview.jpg" alt="Overview" />
-    <!-- 点 Fixed Deposit -->
-    <div class="hotspot" style="left: 10%; top: 43%; width: 80%; height: 10%;" onclick="goTo('screen-fixed')"></div>
+    <div class="hotspot" style="left: 8%; top: 42%; width: 84%; height: 12%;" onclick="goTo('screen-fixed')"></div>
   </div>
 
   <div class="screen" id="screen-fixed">
     <img src="Fixed Deposit.jpg" alt="Fixed Deposit" />
-    <!-- 点某笔FD -->
-    <div class="hotspot" style="left: 10%; top: 76%; width: 80%; height: 12%;" onclick="goTo('screen-receipt')"></div>
+    <div class="hotspot" style="left: 8%; top: 74%; width: 84%; height: 14%;" onclick="goTo('screen-receipt')"></div>
   </div>
 
   <div class="screen" id="screen-receipt">
@@ -148,9 +151,11 @@
       }, 500);
     }
 
-    // 注册 Service Worker（可选）
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.error('SW registration failed', err));
     }
   </script>
 </body>
