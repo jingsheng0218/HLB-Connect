@@ -18,7 +18,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     
     html, body {
-        /* 使用 fixed 锁死屏幕，防止滚动 */
+        /* 锁死屏幕，防止滚动 */
         position: fixed; 
         top: 0; left: 0; right: 0; bottom: 0;
         width: 100%; height: 100%;
@@ -38,23 +38,23 @@
       overflow: hidden;
     }
     
-    /* 背景色补丁：Login用红色，Receipt用米黄 */
+    /* 背景色补丁：利用背景色填补图片比例不够时的黑边 */
     #screen-login { background-color: #a0042b !important; }
     #screen-receipt { background-color: #fbf7ee !important; }
     #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); }
     
-    /* --- 3. 图片处理 (100% 照搬老版本代码) --- */
+    /* --- 3. 图片处理 (这里是核心！完全照搬老版本代码！) --- */
     .screen img {
       width: 100%;
-      height: auto;           /* 老代码逻辑 */
-      max-height: 100%;       /* 老代码逻辑 */
-      object-fit: cover;      /* 老代码逻辑 */
+      height: auto;           /* 老代码逻辑：高度自动，保持比例 */
+      max-height: 100%;       /* 老代码逻辑：高度不超过屏幕 */
+      object-fit: cover;      /* 老代码逻辑：保持覆盖 */
       position: absolute;     /* 老代码逻辑 */
       top: 50%;               /* 老代码逻辑：垂直居中 */
       left: 0;                /* 老代码逻辑 */
-      transform: translateY(-50%); /* 老代码逻辑：垂直修正 */
+      transform: translateY(-50%); /* 老代码逻辑：居中修正 */
     }
 
     /* --- 4. 隐形热区 & 导航栏 --- */
@@ -67,22 +67,21 @@
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* --- 5. 动画类 (保留左右滑动，无 Ripple) --- */
-    .slide-enter-right { animation: slideInRight 0.4s forwards; z-index: 20 !important; }
-    .slide-leave-left { animation: slideOutLeft 0.4s forwards; opacity: 0.8; z-index: 1 !important; }
-    .slide-enter-left { animation: slideInLeft 0.4s forwards; opacity: 0.8; z-index: 1 !important; }
-    .slide-leave-right { animation: slideOutRight 0.4s forwards; z-index: 20 !important; }
+    /* --- 5. 动画类 (使用老版本的 Slide 逻辑) --- */
+    .slide-enter-right { animation: slideInRight 0.5s forwards; z-index: 20 !important; }
+    .slide-leave-left { animation: slideOutLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
+    .slide-enter-left { animation: slideInLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
+    .slide-leave-right { animation: slideOutRight 0.5s forwards; z-index: 20 !important; }
     
     .fade-enter { opacity: 0; z-index: 10; animation: fadeIn 0.3s forwards; }
     .fade-leave { opacity: 0; z-index: 10; }
-    
-    .slide-up-enter { animation: slideInUp 0.4s forwards; z-index: 30 !important; }
+    .slide-up-enter { animation: slideInUp 0.5s forwards; z-index: 30 !important; }
 
-    /* 定义动画关键帧 */
-    @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-    @keyframes slideOutLeft { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-    @keyframes slideOutRight { from { transform: translateX(0); } to { transform: translateX(100%); } }
+    /* 动画关键帧 */
+    @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
     @keyframes slideInUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -171,6 +170,7 @@
     let currentScreen = document.querySelector('.screen.active');
     let isAnimating = false;
 
+    // 页面跳转逻辑
     function goTo(targetId, type) {
       if (isAnimating) return;
       const target = document.getElementById(targetId);
@@ -179,7 +179,7 @@
 
       isAnimating = true;
       
-      // 层级初始化
+      // 设置层级
       if (type === 'slide-back') {
         currentScreen.style.zIndex = 20;
         target.style.zIndex = 10;
@@ -201,17 +201,17 @@
         target.classList.add('fade-enter');
       }
 
-      // 动画结束后清理
+      // 动画清理
       setTimeout(() => {
-        currentScreen.className = 'screen'; // 清除 active 和动画类
-        currentScreen.style = ''; // 清除 style
+        currentScreen.className = 'screen'; 
+        currentScreen.style = ''; 
         
-        target.className = 'screen active'; // 添加 active
-        target.style = ''; // 清除 style
+        target.className = 'screen active';
+        target.style = ''; 
         
         currentScreen = target;
         isAnimating = false;
-      }, 400); 
+      }, 500); // 配合老版本动画时长 0.5s
     }
 
     if ('serviceWorker' in navigator) {
