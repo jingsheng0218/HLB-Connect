@@ -17,15 +17,13 @@
     /* --- 1. 全局设置 --- */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     
-    /* 强制占满 iOS 视口高度 */
-    html { height: -webkit-fill-available; }
-    body { 
-        width: 100vw; 
-        min-height: 100vh; 
-        min-height: -webkit-fill-available; 
-        overflow: hidden; 
-        background: #000; 
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+    html, body {
+        position: fixed; 
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100%; height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         overscroll-behavior: none;
         user-select: none;
         -webkit-user-select: none;
@@ -36,42 +34,41 @@
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: #fff; 
       opacity: 0; pointer-events: none; z-index: 1;
-      /* 这里的 overflow: hidden 很重要，防止拉伸后的边缘溢出 */
       overflow: hidden;
       transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s;
     }
     
-    /* 背景色补丁 */
+    /* 【关键修改】设置背景色，防止图片比例不够长时出现黑边 */
+    /* Login 页面背景设为深红，填补顶部或底部的空隙 */
     #screen-login { background-color: #a0042b !important; }
+    /* Receipt 页面背景设为米黄 */
     #screen-receipt { background-color: #fbf7ee !important; }
+    /* 其他页面默认白色，填补空隙 */
+    #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); }
     
-    /* --- 3. 图片核心适配 (结合了新老版本的优点) --- */
-    .screen img { 
-        display: block;
-        width: 100%; 
-        height: 100%; 
-        
-        /* 重点：使用 fill 强制拉伸填满容器。
-           虽然 cover (老版本) 不变形，但会导致内容被裁切或留黑边。
-           对于全屏 UI 原型，fill 是唯一能保证所有按钮都在屏幕内的方案。
-        */
-        object-fit: fill; 
-        
-        /* 确保图片紧贴顶部，防止灵动岛区域留白 */
-        position: absolute;
-        top: 0;
-        left: 0;
+    /* --- 3. 图片处理 (完全回归老版本逻辑) --- */
+    .screen img {
+      position: absolute;
+      
+      /* 【回归老版本】保持原始比例，绝不拉伸变形 */
+      width: 100%;
+      height: 100%; 
+      object-fit: cover; 
+      
+      /* 【回归老版本】居中定位，确保画面核心在中间 */
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     /* --- 4. 隐形热区 & 导航栏 --- */
     .hotspot { position: absolute; z-index: 20; cursor: pointer; }
     
-    /* 底部导航栏高度微调：适配 iPhone 16 Pro 的 Home Indicator */
     .bottom-nav-container {
       position: absolute; bottom: 0; left: 0; width: 100%; 
-      height: 13%; /* 稍微增加高度，确保覆盖底部 */
+      height: 13%; 
       display: flex; z-index: 50;
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
