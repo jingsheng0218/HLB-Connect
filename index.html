@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#ffffff" />
   
@@ -37,11 +38,10 @@
       z-index: 0;
     }
     
-    /* 【修改2】给 Login 页面单独加红色背景，彻底消灭顶部白边 */
-    #screen-login { background-color: #a0042b !important; }
-    /* 给 Receipt 页面加米色背景 */
-    #screen-receipt { background-color: #fbf7ee !important; }
-    /* 其他页面白色背景 */
+    /* 2. 【背景色补丁】解决 Login 和 Receipt 页面因为图片不够长，底部露出的空隙 */
+    /* 既然顶部对齐了，底部肯定会空出来，这里用颜色填满，视觉上就完美了 */
+    #screen-login { background-color: #a0042b !important; } /* 红色填底 */
+    #screen-receipt { background-color: #fbf7ee !important; } /* 米色填底 */
     #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active {
@@ -50,19 +50,22 @@
       z-index: 10;
     }
 
-    /* 【关键修改】图片保持比例，但改为【顶部对齐】 */
+    /* 3. 【关键修改】图片逻辑 */
     .screen img {
       width: 100%;
-      height: auto;
-      max-height: 100%;
+      height: auto;           /* 保持比例 */
+      max-height: 100%;       /* 不超过屏幕 */
       object-fit: cover;
       
       position: absolute;
-      /* 改为 0，不再是 50% */
+      
+      /* 【这里改为 0】 */
+      /* 意思是：紧贴着“安全区”的下边缘，消灭顶部的白缝 */
       top: 0; 
       left: 0;
-      /* 去掉 translateY，不再垂直居中，而是顶头显示 */
-      transform: none; 
+      
+      /* 【删掉居中】不再垂直居中，否则上面又会有缝隙 */
+      /* transform: translateY(-50%); */ 
     }
 
     .hotspot {
@@ -72,13 +75,14 @@
       cursor: pointer;
     }
 
+    /* 底部导航栏 */
     .bottom-nav-container {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 12%; 
       display: flex; z-index: 50;
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* 动画保持不变 */
+    /* 动画逻辑 (保持不变) */
     @keyframes slideInLeft { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
     @keyframes slideInRight { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
