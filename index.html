@@ -6,6 +6,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#a0042b" />
+  
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
+
   <title>HLB Connect Prototype</title>
   <style>
     /* --- 1. 全局基础设置 --- */
@@ -21,8 +27,7 @@
       overflow: hidden;
     }
     
-    /* 【新增重点】针对 Login 页面设置深红色背景 (#a0042b) */
-    /* 确保全面屏状态栏区域显示正确的红色 */
+    /* 针对 Login 页面设置深红色背景 (#a0042b) */
     #screen-login {
       background-color: #a0042b !important;
     }
@@ -41,7 +46,7 @@
     .hotspot {
       position: absolute;
       z-index: 20;
-      /* background: rgba(255, 0, 0, 0.3); */ /* 【调试用】解开注释可查看红色按钮区域 */
+      /* background: rgba(255, 0, 0, 0.3); */ 
       cursor: pointer;
     }
 
@@ -253,6 +258,13 @@
         currentScreen = target;
         isAnimating = false;
       }, 400); 
+    }
+
+    // 【核心修复 2】注册 Service Worker (启用缓存)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.error('SW registration failed', err));
     }
   </script>
 </body>
