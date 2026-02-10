@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#a0042b" />
   <title>HLB Connect Prototype</title>
   <style>
     /* --- 1. 全局基础设置 --- */
@@ -20,8 +21,13 @@
       overflow: hidden;
     }
     
-    /* 【重点】专门针对 Receipt 页面设置米黄色背景 (#fbf7ee) */
-    /* 这样即使图片有边缘误差，顶部状态栏也会显示这个颜色 */
+    /* 【新增重点】针对 Login 页面设置深红色背景 (#a0042b) */
+    /* 确保全面屏状态栏区域显示正确的红色 */
+    #screen-login {
+      background-color: #a0042b !important;
+    }
+    
+    /* 针对 Receipt 页面设置米黄色背景 (#fbf7ee) */
     #screen-receipt {
       background-color: #fbf7ee !important; 
     }
