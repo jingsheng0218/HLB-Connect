@@ -14,72 +14,81 @@
 
   <title>HLB Connect Prototype</title>
   <style>
-    /* --- 1. 全局基础设置 --- */
+    /* --- 1. 全局设置 --- */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    
+    /* 强制占满 iOS 视口高度 */
+    html { height: -webkit-fill-available; }
+    body { 
+        width: 100vw; 
+        min-height: 100vh; 
+        min-height: -webkit-fill-available; 
+        overflow: hidden; 
+        background: #000; 
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+        overscroll-behavior: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
 
-    /* --- 2. 屏幕容器 (Screen) --- */
+    /* --- 2. 屏幕容器 --- */
     .screen {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: #fff; /* 默认白色背景 */
+      background: #fff; 
       opacity: 0; pointer-events: none; z-index: 1;
-      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s;
+      /* 这里的 overflow: hidden 很重要，防止拉伸后的边缘溢出 */
       overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s;
     }
     
-    /* 针对 Login 页面设置深红色背景 (#a0042b) */
-    #screen-login {
-      background-color: #a0042b !important;
-    }
-    
-    /* 针对 Receipt 页面设置米黄色背景 (#fbf7ee) */
-    #screen-receipt {
-      background-color: #fbf7ee !important; 
-    }
+    /* 背景色补丁 */
+    #screen-login { background-color: #a0042b !important; }
+    #screen-receipt { background-color: #fbf7ee !important; }
 
     .screen.active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); }
     
-    /* 图片强制全屏拉伸 */
-    .screen img { width: 100%; height: 100%; object-fit: fill; display: block; }
-
-    /* --- 3. 隐形热区 (Hotspots) --- */
-    .hotspot {
-      position: absolute;
-      z-index: 20;
-      /* background: rgba(255, 0, 0, 0.3); */ 
-      cursor: pointer;
+    /* --- 3. 图片核心适配 (结合了新老版本的优点) --- */
+    .screen img { 
+        display: block;
+        width: 100%; 
+        height: 100%; 
+        
+        /* 重点：使用 fill 强制拉伸填满容器。
+           虽然 cover (老版本) 不变形，但会导致内容被裁切或留黑边。
+           对于全屏 UI 原型，fill 是唯一能保证所有按钮都在屏幕内的方案。
+        */
+        object-fit: fill; 
+        
+        /* 确保图片紧贴顶部，防止灵动岛区域留白 */
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
-    /* --- 4. 底部导航栏 (Bottom Nav) --- */
+    /* --- 4. 隐形热区 & 导航栏 --- */
+    .hotspot { position: absolute; z-index: 20; cursor: pointer; }
+    
+    /* 底部导航栏高度微调：适配 iPhone 16 Pro 的 Home Indicator */
     .bottom-nav-container {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 12%; 
+      position: absolute; bottom: 0; left: 0; width: 100%; 
+      height: 13%; /* 稍微增加高度，确保覆盖底部 */
       display: flex; z-index: 50;
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* --- 5. 交互反馈 (水波纹 Ripple) --- */
+    /* --- 5. 交互与动画 --- */
     .ripple {
       position: absolute; border-radius: 50%; background: rgba(0, 0, 0, 0.08);
       transform: scale(0); animation: ripple-anim 0.4s linear; pointer-events: none;
     }
-    @keyframes ripple-anim {
-      to { transform: scale(3.5); opacity: 0; }
-    }
+    @keyframes ripple-anim { to { transform: scale(3.5); opacity: 0; } }
 
-    /* --- 6. 页面切换动画 (Transitions) --- */
-    /* 进入下一级 */
     .slide-enter-right { transform: translateX(100%); z-index: 20 !important; }
     .slide-leave-left { transform: translateX(-25%); opacity: 0.8; z-index: 1 !important; }
-    
-    /* 返回上一级 */
     .slide-enter-left { transform: translateX(-25%); opacity: 0.8; z-index: 1 !important; }
     .slide-leave-right { transform: translateX(100%); z-index: 20 !important; }
-
-    /* 底部菜单淡入淡出 */
     .fade-enter { opacity: 0; z-index: 10; }
     .fade-leave { opacity: 0; z-index: 10; }
-
-    /* 登录向上 */
     .slide-up-enter { transform: translateY(100%); z-index: 30 !important; }
   </style>
 </head>
@@ -87,8 +96,7 @@
 
   <div class="screen active" id="screen-login">
     <img src="1_Login.jpg" alt="Login Page" />
-    <div class="hotspot" style="left: 10%; top: 53.5%; width: 80%; height: 7.5%;" 
-         onclick="goTo('screen-home', 'slide-up')"></div>
+    <div class="hotspot" style="left: 10%; top: 53.5%; width: 80%; height: 7.5%;" onclick="goTo('screen-home', 'slide-up')"></div>
   </div>
 
   <div class="screen" id="screen-home">
@@ -104,8 +112,7 @@
 
   <div class="screen" id="screen-overview">
     <img src="3_Overview.jpg" alt="Overview Page" />
-    <div class="hotspot" style="left: 0; top: 36%; width: 100%; height: 14%;" 
-         onclick="goTo('screen-fixed', 'slide-next')"></div>
+    <div class="hotspot" style="left: 0; top: 36%; width: 100%; height: 14%;" onclick="goTo('screen-fixed', 'slide-next')"></div>
     <div class="bottom-nav-container">
       <div class="nav-btn" onclick="goTo('screen-home', 'fade')"></div>
       <div class="nav-btn" onclick="goTo('screen-overview', 'fade')"></div>
@@ -117,10 +124,8 @@
 
   <div class="screen" id="screen-fixed">
     <img src="4_FixedDeposit.jpg" alt="Fixed Deposit Page" />
-    <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 10%;" 
-         onclick="goTo('screen-overview', 'slide-back')"></div>
-    <div class="hotspot" style="left: 0; top: 58%; width: 100%; height: 16%;" 
-         onclick="goTo('screen-receipt', 'slide-next')"></div>
+    <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 10%;" onclick="goTo('screen-overview', 'slide-back')"></div>
+    <div class="hotspot" style="left: 0; top: 58%; width: 100%; height: 16%;" onclick="goTo('screen-receipt', 'slide-next')"></div>
     <div class="bottom-nav-container">
       <div class="nav-btn" onclick="goTo('screen-home', 'fade')"></div>
       <div class="nav-btn" onclick="goTo('screen-overview', 'fade')"></div>
@@ -132,9 +137,7 @@
 
   <div class="screen" id="screen-receipt">
     <img src="5_Receipt.jpg" alt="Receipt Page" />
-    
-    <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 8%;" 
-         onclick="goTo('screen-fixed', 'slide-back')"></div>
+    <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 8%;" onclick="goTo('screen-fixed', 'slide-back')"></div>
   </div>
 
   <div class="screen" id="screen-menu">
@@ -147,7 +150,6 @@
        <div class="nav-btn" onclick="goTo('screen-activities', 'fade')"></div>
     </div>
   </div>
-
   <div class="screen" id="screen-apply">
     <img src="7_Apply.jpg" alt="Apply" />
     <div class="bottom-nav-container">
@@ -158,7 +160,6 @@
        <div class="nav-btn" onclick="goTo('screen-activities', 'fade')"></div>
     </div>
   </div>
-
   <div class="screen" id="screen-activities">
     <img src="8_Activities.jpg" alt="Activities" />
     <div class="bottom-nav-container">
@@ -174,34 +175,28 @@
     let currentScreen = document.querySelector('.screen.active');
     let isAnimating = false;
 
-    // 水波纹效果
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('hotspot') || e.target.classList.contains('nav-btn')) {
         const rect = e.target.getBoundingClientRect();
         const ripple = document.createElement('div');
         ripple.className = 'ripple';
-        
         const size = Math.max(rect.width, rect.height);
         ripple.style.width = ripple.style.height = `${size}px`;
         ripple.style.left = `${e.clientX - rect.left - size/2}px`;
         ripple.style.top = `${e.clientY - rect.top - size/2}px`;
-        
         e.target.appendChild(ripple);
         setTimeout(() => ripple.remove(), 500);
       }
     });
 
-    // 页面跳转逻辑
     function goTo(targetId, type) {
       if (isAnimating) return;
       const target = document.getElementById(targetId);
-      
       if (!target || (target === currentScreen && type !== 'fade')) return;
       if (target === currentScreen) return;
 
       isAnimating = true;
       
-      // 层级初始化
       if (type === 'slide-back') {
         currentScreen.style.zIndex = 20;
         target.style.zIndex = 10;
@@ -212,9 +207,8 @@
         currentScreen.style.zIndex = 10;
       }
 
-      void target.offsetWidth; // 强制重绘
+      void target.offsetWidth; 
 
-      // 执行动画
       if (type === 'slide-next') {
         target.classList.add('slide-enter-right');
         currentScreen.classList.add('slide-leave-left');
@@ -242,25 +236,21 @@
         });
       }
 
-      // 动画清理
       setTimeout(() => {
         currentScreen.classList.remove('active', 'slide-leave-left', 'slide-leave-right');
         currentScreen.style.transform = '';
         currentScreen.style.opacity = '';
         currentScreen.style.zIndex = '';
-        
         target.classList.remove('slide-enter-right', 'slide-up-enter');
         target.style.transform = '';
         target.style.opacity = '';
         target.style.zIndex = '';
         target.classList.add('active');
-        
         currentScreen = target;
         isAnimating = false;
       }, 400); 
     }
 
-    // 【核心修复 2】注册 Service Worker (启用缓存)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(reg => console.log('SW registered!', reg))
