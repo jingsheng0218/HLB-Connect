@@ -17,7 +17,15 @@
   
   <title>HLB Connect</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* --- 全局设置 --- */
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      
+      /* 【这里是你要求的唯一修改】去除移动端点击高亮 */
+      -webkit-tap-highlight-color: transparent; 
+    }
 
     html, body {
       width: 100vw;
@@ -38,10 +46,9 @@
       z-index: 0;
     }
     
-    /* 2. 【背景色补丁】解决 Login 和 Receipt 页面因为图片不够长，底部露出的空隙 */
-    /* 既然顶部对齐了，底部肯定会空出来，这里用颜色填满，视觉上就完美了 */
-    #screen-login { background-color: #a0042b !important; } /* 红色填底 */
-    #screen-receipt { background-color: #fbf7ee !important; } /* 米色填底 */
+    /* 背景色补丁 */
+    #screen-login { background-color: #a0042b !important; }
+    #screen-receipt { background-color: #fbf7ee !important; }
     #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active {
@@ -50,22 +57,16 @@
       z-index: 10;
     }
 
-    /* 3. 【关键修改】图片逻辑 */
+    /* 图片逻辑：顶头对齐 + 保持比例 */
     .screen img {
       width: 100%;
-      height: auto;           /* 保持比例 */
-      max-height: 100%;       /* 不超过屏幕 */
+      height: auto;
+      max-height: 100%;
       object-fit: cover;
       
       position: absolute;
-      
-      /* 【这里改为 0】 */
-      /* 意思是：紧贴着“安全区”的下边缘，消灭顶部的白缝 */
       top: 0; 
       left: 0;
-      
-      /* 【删掉居中】不再垂直居中，否则上面又会有缝隙 */
-      /* transform: translateY(-50%); */ 
     }
 
     .hotspot {
@@ -82,7 +83,7 @@
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* 动画逻辑 (保持不变) */
+    /* 动画逻辑 */
     @keyframes slideInLeft { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
     @keyframes slideInRight { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
