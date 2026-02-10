@@ -38,23 +38,26 @@
       overflow: hidden;
     }
     
-    /* 背景色补丁：利用背景色填补图片比例不够时的黑边 */
+    /* 【背景色补丁】即使图片比例和屏幕有一点点误差，这些颜色会填满缝隙，看不出黑边 */
     #screen-login { background-color: #a0042b !important; }
     #screen-receipt { background-color: #fbf7ee !important; }
     #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); }
     
-    /* --- 3. 图片处理 (这里是核心！完全照搬老版本代码！) --- */
+    /* --- 3. 图片处理 (这里完全还原了老版本的代码逻辑) --- */
     .screen img {
       width: 100%;
-      height: auto;           /* 老代码逻辑：高度自动，保持比例 */
-      max-height: 100%;       /* 老代码逻辑：高度不超过屏幕 */
-      object-fit: cover;      /* 老代码逻辑：保持覆盖 */
-      position: absolute;     /* 老代码逻辑 */
-      top: 50%;               /* 老代码逻辑：垂直居中 */
-      left: 0;                /* 老代码逻辑 */
-      transform: translateY(-50%); /* 老代码逻辑：居中修正 */
+      /* 核心：高度自动，最大不超过屏幕，保持原始比例 */
+      height: auto;
+      max-height: 100%;
+      object-fit: cover;
+      
+      /* 核心：绝对居中定位 */
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
     }
 
     /* --- 4. 隐形热区 & 导航栏 --- */
@@ -67,7 +70,7 @@
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* --- 5. 动画类 (使用老版本的 Slide 逻辑) --- */
+    /* --- 5. 动画类 (纯净跳转，无水波纹) --- */
     .slide-enter-right { animation: slideInRight 0.5s forwards; z-index: 20 !important; }
     .slide-leave-left { animation: slideOutLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
     .slide-enter-left { animation: slideInLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
@@ -205,13 +208,11 @@
       setTimeout(() => {
         currentScreen.className = 'screen'; 
         currentScreen.style = ''; 
-        
         target.className = 'screen active';
         target.style = ''; 
-        
         currentScreen = target;
         isAnimating = false;
-      }, 500); // 配合老版本动画时长 0.5s
+      }, 500); 
     }
 
     if ('serviceWorker' in navigator) {
