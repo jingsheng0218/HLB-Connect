@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#ffffff" />
   
@@ -16,18 +16,13 @@
   
   <title>HLB Connect</title>
   <style>
-    /* --- 100% 照搬老版本 CSS --- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #fff; /* 老版本背景是白色 */
+      background: #fff;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -41,6 +36,13 @@
       pointer-events: none;
       z-index: 0;
     }
+    
+    /* 【修改2】给 Login 页面单独加红色背景，彻底消灭顶部白边 */
+    #screen-login { background-color: #a0042b !important; }
+    /* 给 Receipt 页面加米色背景 */
+    #screen-receipt { background-color: #fbf7ee !important; }
+    /* 其他页面白色背景 */
+    #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
     .screen.active {
       opacity: 1;
@@ -48,33 +50,35 @@
       z-index: 10;
     }
 
-    /* 【核心】完全保留老版本的图片处理逻辑 */
+    /* 【关键修改】图片保持比例，但改为【顶部对齐】 */
     .screen img {
       width: 100%;
       height: auto;
       max-height: 100%;
       object-fit: cover;
+      
       position: absolute;
-      top: 50%;
+      /* 改为 0，不再是 50% */
+      top: 0; 
       left: 0;
-      transform: translateY(-50%);
+      /* 去掉 translateY，不再垂直居中，而是顶头显示 */
+      transform: none; 
     }
 
     .hotspot {
       position: absolute;
-      background: rgba(255, 0, 0, 0); /* 透明热区 */
+      background: rgba(255, 0, 0, 0);
       z-index: 20;
       cursor: pointer;
     }
 
-    /* --- 底部导航栏容器 (新增，为了适配新菜单) --- */
     .bottom-nav-container {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 12%; 
       display: flex; z-index: 50;
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* --- 老版本动画逻辑 --- */
+    /* 动画保持不变 */
     @keyframes slideInLeft { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
     @keyframes slideInRight { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
@@ -83,16 +87,12 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .screen.animating { pointer-events: none; z-index: 5; }
-
     .slide-in-left { animation: slideInLeft 0.5s forwards; }
     .slide-out-left { animation: slideOutLeft 0.5s forwards; }
     .slide-in-right { animation: slideInRight 0.5s forwards; }
     .slide-out-right { animation: slideOutRight 0.5s forwards; }
-    
-    /* 新增动画辅助类 */
     .slide-up-enter { animation: slideInUp 0.5s forwards; }
     .fade-enter { animation: fadeIn 0.3s forwards; }
-
   </style>
 </head>
 
@@ -180,14 +180,10 @@
   <script>
     let currentScreen = document.querySelector('.screen.active');
 
-    // 使用老版本的 JS 逻辑，仅增加了新页面ID的支持
     function goTo(targetId, type) {
       const target = document.getElementById(targetId);
       if (!target || target === currentScreen) return;
 
-      // 判断方向逻辑 (简化版)
-      const isForward = type === 'slide-next' || type === 'slide-up';
-      
       let outClass = 'slide-out-left';
       let inClass = 'slide-in-right';
 
@@ -198,18 +194,16 @@
         inClass = 'slide-up-enter';
       } else if (type === 'fade') {
         inClass = 'fade-enter';
-        outClass = ''; // Fade 不需要 outClass
+        outClass = '';
       }
 
-      // 添加动画类
       if (outClass) currentScreen.classList.add('animating', outClass);
       target.classList.add('screen', 'animating', inClass);
-      
       target.style.zIndex = 20;
 
       setTimeout(() => {
         if (outClass) currentScreen.classList.remove('active', 'animating', outClass);
-        else currentScreen.classList.remove('active'); // for fade
+        else currentScreen.classList.remove('active');
         
         target.classList.remove('animating', inClass);
         target.classList.add('active');
@@ -224,5 +218,4 @@
     }
   </script>
 </body>
-
 </html>
