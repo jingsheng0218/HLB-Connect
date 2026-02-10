@@ -1,104 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#a0042b" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#ffffff" />
   
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
-
-  <title>HLB Connect Prototype</title>
+  
+  <title>HLB Connect</title>
   <style>
-    /* --- 1. 全局设置 --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    
+    /* --- 100% 照搬老版本 CSS --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
-        /* 锁死屏幕，防止滚动 */
-        position: fixed; 
-        top: 0; left: 0; right: 0; bottom: 0;
-        width: 100%; height: 100%;
-        overflow: hidden;
-        background: #000;
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        overscroll-behavior: none;
-        user-select: none;
-        -webkit-user-select: none;
-    }
-
-    /* --- 2. 屏幕容器 --- */
-    .screen {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: #fff; 
-      opacity: 0; pointer-events: none; z-index: 1;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      background: #fff; /* 老版本背景是白色 */
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    
-    /* 【背景色补丁】即使图片比例和屏幕有一点点误差，这些颜色会填满缝隙，看不出黑边 */
-    #screen-login { background-color: #a0042b !important; }
-    #screen-receipt { background-color: #fbf7ee !important; }
-    #screen-home, #screen-overview, #screen-fixed { background-color: #ffffff !important; }
 
-    .screen.active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); }
-    
-    /* --- 3. 图片处理 (这里完全还原了老版本的代码逻辑) --- */
+    .screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* 【核心】完全保留老版本的图片处理逻辑 */
     .screen img {
       width: 100%;
-      /* 核心：高度自动，最大不超过屏幕，保持原始比例 */
       height: auto;
       max-height: 100%;
       object-fit: cover;
-      
-      /* 核心：绝对居中定位 */
       position: absolute;
       top: 50%;
       left: 0;
       transform: translateY(-50%);
     }
 
-    /* --- 4. 隐形热区 & 导航栏 --- */
-    .hotspot { position: absolute; z-index: 20; cursor: pointer; }
-    
+    .hotspot {
+      position: absolute;
+      background: rgba(255, 0, 0, 0); /* 透明热区 */
+      z-index: 20;
+      cursor: pointer;
+    }
+
+    /* --- 底部导航栏容器 (新增，为了适配新菜单) --- */
     .bottom-nav-container {
-      position: absolute; bottom: 0; left: 0; width: 100%; 
-      height: 13%; 
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 12%; 
       display: flex; z-index: 50;
     }
     .nav-btn { flex: 1; height: 100%; position: relative; cursor: pointer; }
 
-    /* --- 5. 动画类 (纯净跳转，无水波纹) --- */
-    .slide-enter-right { animation: slideInRight 0.5s forwards; z-index: 20 !important; }
-    .slide-leave-left { animation: slideOutLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
-    .slide-enter-left { animation: slideInLeft 0.5s forwards; opacity: 0.8; z-index: 1 !important; }
-    .slide-leave-right { animation: slideOutRight 0.5s forwards; z-index: 20 !important; }
-    
-    .fade-enter { opacity: 0; z-index: 10; animation: fadeIn 0.3s forwards; }
-    .fade-leave { opacity: 0; z-index: 10; }
-    .slide-up-enter { animation: slideInUp 0.5s forwards; z-index: 30 !important; }
-
-    /* 动画关键帧 */
-    @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
+    /* --- 老版本动画逻辑 --- */
+    @keyframes slideInLeft { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
-    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideInRight { from { transform: translateX(-100%); opacity: 0.3; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
     @keyframes slideInUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+    .screen.animating { pointer-events: none; z-index: 5; }
+
+    .slide-in-left { animation: slideInLeft 0.5s forwards; }
+    .slide-out-left { animation: slideOutLeft 0.5s forwards; }
+    .slide-in-right { animation: slideInRight 0.5s forwards; }
+    .slide-out-right { animation: slideOutRight 0.5s forwards; }
+    
+    /* 新增动画辅助类 */
+    .slide-up-enter { animation: slideInUp 0.5s forwards; }
+    .fade-enter { animation: fadeIn 0.3s forwards; }
+
   </style>
 </head>
+
 <body>
 
   <div class="screen active" id="screen-login">
-    <img src="1_Login.jpg" alt="Login Page" />
+    <img src="1_Login.jpg" alt="Login" />
     <div class="hotspot" style="left: 10%; top: 53.5%; width: 80%; height: 7.5%;" onclick="goTo('screen-home', 'slide-up')"></div>
   </div>
 
   <div class="screen" id="screen-home">
-    <img src="2_Home.jpg" alt="Home Page" />
+    <img src="2_Home.jpg" alt="Home" />
     <div class="bottom-nav-container">
       <div class="nav-btn" onclick="goTo('screen-home', 'fade')"></div>
       <div class="nav-btn" onclick="goTo('screen-overview', 'fade')"></div>
@@ -109,7 +115,7 @@
   </div>
 
   <div class="screen" id="screen-overview">
-    <img src="3_Overview.jpg" alt="Overview Page" />
+    <img src="3_Overview.jpg" alt="Overview" />
     <div class="hotspot" style="left: 0; top: 36%; width: 100%; height: 14%;" onclick="goTo('screen-fixed', 'slide-next')"></div>
     <div class="bottom-nav-container">
       <div class="nav-btn" onclick="goTo('screen-home', 'fade')"></div>
@@ -121,7 +127,7 @@
   </div>
 
   <div class="screen" id="screen-fixed">
-    <img src="4_FixedDeposit.jpg" alt="Fixed Deposit Page" />
+    <img src="4_FixedDeposit.jpg" alt="Fixed Deposit" />
     <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 10%;" onclick="goTo('screen-overview', 'slide-back')"></div>
     <div class="hotspot" style="left: 0; top: 58%; width: 100%; height: 16%;" onclick="goTo('screen-receipt', 'slide-next')"></div>
     <div class="bottom-nav-container">
@@ -134,7 +140,7 @@
   </div>
 
   <div class="screen" id="screen-receipt">
-    <img src="5_Receipt.jpg" alt="Receipt Page" />
+    <img src="5_Receipt.jpg" alt="Receipt" />
     <div class="hotspot" style="left: 0; top: 0; width: 15%; height: 8%;" onclick="goTo('screen-fixed', 'slide-back')"></div>
   </div>
 
@@ -148,6 +154,7 @@
        <div class="nav-btn" onclick="goTo('screen-activities', 'fade')"></div>
     </div>
   </div>
+  
   <div class="screen" id="screen-apply">
     <img src="7_Apply.jpg" alt="Apply" />
     <div class="bottom-nav-container">
@@ -158,6 +165,7 @@
        <div class="nav-btn" onclick="goTo('screen-activities', 'fade')"></div>
     </div>
   </div>
+  
   <div class="screen" id="screen-activities">
     <img src="8_Activities.jpg" alt="Activities" />
     <div class="bottom-nav-container">
@@ -171,55 +179,50 @@
 
   <script>
     let currentScreen = document.querySelector('.screen.active');
-    let isAnimating = false;
 
-    // 页面跳转逻辑
+    // 使用老版本的 JS 逻辑，仅增加了新页面ID的支持
     function goTo(targetId, type) {
-      if (isAnimating) return;
       const target = document.getElementById(targetId);
-      if (!target || (target === currentScreen && type !== 'fade')) return;
-      if (target === currentScreen) return;
+      if (!target || target === currentScreen) return;
 
-      isAnimating = true;
+      // 判断方向逻辑 (简化版)
+      const isForward = type === 'slide-next' || type === 'slide-up';
       
-      // 设置层级
+      let outClass = 'slide-out-left';
+      let inClass = 'slide-in-right';
+
       if (type === 'slide-back') {
-        currentScreen.style.zIndex = 20;
-        target.style.zIndex = 10;
-      } else {
-        target.style.zIndex = 20;
-        currentScreen.style.zIndex = 10;
-      }
-
-      // 触发动画
-      if (type === 'slide-next') {
-        target.classList.add('slide-enter-right');
-        currentScreen.classList.add('slide-leave-left');
-      } else if (type === 'slide-back') {
-        currentScreen.classList.add('slide-leave-right');
-        target.classList.add('slide-enter-left');
+        outClass = 'slide-out-right';
+        inClass = 'slide-in-left';
       } else if (type === 'slide-up') {
-        target.classList.add('slide-up-enter');
+        inClass = 'slide-up-enter';
       } else if (type === 'fade') {
-        target.classList.add('fade-enter');
+        inClass = 'fade-enter';
+        outClass = ''; // Fade 不需要 outClass
       }
 
-      // 动画清理
+      // 添加动画类
+      if (outClass) currentScreen.classList.add('animating', outClass);
+      target.classList.add('screen', 'animating', inClass);
+      
+      target.style.zIndex = 20;
+
       setTimeout(() => {
-        currentScreen.className = 'screen'; 
-        currentScreen.style = ''; 
-        target.className = 'screen active';
-        target.style = ''; 
+        if (outClass) currentScreen.classList.remove('active', 'animating', outClass);
+        else currentScreen.classList.remove('active'); // for fade
+        
+        target.classList.remove('animating', inClass);
+        target.classList.add('active');
         currentScreen = target;
-        isAnimating = false;
-      }, 500); 
+      }, 500);
     }
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('SW registered!', reg))
+        .then(reg => console.log('SW registered'))
         .catch(err => console.error('SW registration failed', err));
     }
   </script>
 </body>
+
 </html>
